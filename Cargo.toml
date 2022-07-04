@@ -1,0 +1,16 @@
+[package]
+name = "ansi_rs"
+description = "A library for parsing ANSI Escape Codes"
+homepage = "https://gitlab.com/zhiburt/ansi_rs"
+repository = "https://gitlab.com/zhiburt/ansi_rs"
+authors = ["Maxim Zhiburt <zhiburt@gmail.com>"]
+version = "0.1.0"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+nom = "7.1.1"
+
+[features]
+default = ["std"]
+std = ["nom/std"]
