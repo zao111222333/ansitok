@@ -1,7 +1,6 @@
 stages:
   - build
-  - fmt
-  - clippy
+  - lint
   - test
 
 check:
@@ -15,22 +14,25 @@ check:
 
 test:
   stage: test
+  extends: lint
   parallel:
     matrix:
       - image: [rust:latest, rustlang/rust:nightly]
-      - feature: ['', 'std']
+        feature: ["", "std"]
   image: ${image}
   script:
     - cargo test --no-default-features --features=${feature}
 
 test_ignored:
   stage: test
+  extends: lint
   image: "rust:latest"
   script:
     - cargo test -- --ignored
 
 clippy:
-  stage: clippy
+  stage: lint
+  extends: build
   image: "rust:latest"
   before_script:
     - rustup component add clippy
@@ -38,7 +40,8 @@ clippy:
     - cargo clippy --all
 
 fmt:
-  stage: fmt
+  stage: lint
+  extends: build
   image: "rust:latest"
   before_script:
     - rustup component add rustfmt
