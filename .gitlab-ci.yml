@@ -14,7 +14,7 @@ check:
 
 test:
   stage: test
-  extends: lint
+  needs: ["lint"]
   parallel:
     matrix:
       - image: [rust:latest, rustlang/rust:nightly]
@@ -25,14 +25,14 @@ test:
 
 test_ignored:
   stage: test
-  extends: lint
+  needs: ["lint"]
   image: "rust:latest"
   script:
     - cargo test -- --ignored
 
 clippy:
   stage: lint
-  extends: build
+  needs: ["build"]
   image: "rust:latest"
   before_script:
     - rustup component add clippy
@@ -41,7 +41,7 @@ clippy:
 
 fmt:
   stage: lint
-  extends: build
+  needs: ["build"]
   image: "rust:latest"
   before_script:
     - rustup component add rustfmt
