@@ -12,9 +12,24 @@ check:
   script:
     - cargo check --verbose
 
+clippy:
+  stage: lint
+  image: "rust:latest"
+  before_script:
+    - rustup component add clippy
+  script:
+    - cargo clippy --all
+
+fmt:
+  stage: lint
+  image: "rust:latest"
+  before_script:
+    - rustup component add rustfmt
+  script:
+    - cargo fmt --all -- --check
+
 test:
   stage: test
-  needs: ["lint"]
   parallel:
     matrix:
       - image: [rust:latest, rustlang/rust:nightly]
@@ -25,25 +40,6 @@ test:
 
 test_ignored:
   stage: test
-  needs: ["lint"]
   image: "rust:latest"
   script:
     - cargo test -- --ignored
-
-clippy:
-  stage: lint
-  needs: ["build"]
-  image: "rust:latest"
-  before_script:
-    - rustup component add clippy
-  script:
-    - cargo clippy --all
-
-fmt:
-  stage: lint
-  needs: ["build"]
-  image: "rust:latest"
-  before_script:
-    - rustup component add rustfmt
-  script:
-    - cargo fmt --all -- --check
