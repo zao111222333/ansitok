@@ -1,0 +1,42 @@
+stages:
+  - build
+  - fmt
+  - clippy
+  - test
+
+check:
+  stage: build
+  parallel:
+    matrix:
+      - rust-version: [rust:latest, rustlang/rust:nightly]
+  image: ${rust-version}
+  script:
+    - cargo check --verbose
+
+test:
+  stage: test
+  image: "rust:latest"
+  script:
+    - cargo test
+
+test_ignored:
+  stage: test
+  image: "rust:latest"
+  script:
+    - cargo test -- --ignored
+
+clippy:
+  stage: clippy
+  image: "rust:latest"
+  before_script:
+    - rustup component add clippy
+  script:
+    - cargo clippy --all
+
+fmt:
+  stage: fmt
+  image: "rust:latest"
+  before_script:
+    - rustup component add rustfmt
+  script:
+    - cargo fmt --all -- --check
