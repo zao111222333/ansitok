@@ -8,8 +8,8 @@ check:
   stage: build
   parallel:
     matrix:
-      - rust-version: [rust:latest, rustlang/rust:nightly]
-  image: ${rust-version}
+      - image: [rust:latest, rustlang/rust:nightly]
+  image: ${image}
   script:
     - cargo check --verbose
 
