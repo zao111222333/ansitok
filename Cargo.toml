@@ -1,9 +1,11 @@
 [package]
 name = "ansitok"
 description = "A library for parsing ANSI Escape Codes"
-homepage = "https://gitlab.com/zhiburt/ansi_rs"
-repository = "https://gitlab.com/zhiburt/ansi_rs"
+homepage = "https://gitlab.com/zhiburt/ansitok"
+repository = "https://gitlab.com/zhiburt/ansitok"
 authors = ["Maxim Zhiburt <zhiburt@gmail.com>"]
+keywords = ["ansi", "escape", "terminal"]
+categories = ["parser-implementations", "no-std"]
 version = "0.1.0"
 license = "MIT"
 edition = "2021"
