@@ -1,5 +1,7 @@
 use ansi_rs::{
-    parse_ansi_sgr, AnsiColor, Output,
+    parse_ansi_sgr,
+    AnsiColor::*,
+    Output,
     Output::Escape as esc,
     VisualAttribute::{self, *},
 };
@@ -14,7 +16,7 @@ macro_rules! test_parse_sgr {
     };
 }
 
-test_parse_sgr!(parse_empty, "", []);
+test_parse_sgr!(parse_empty, "", []); // is this correct? or we shall consider it a RESET 0?
 test_parse_sgr!(
     parse_valid_ansi_sequence,
     "\x1b[38;5;45mFoobar\x1b[0m",
@@ -25,16 +27,12 @@ test_parse_sgr!(
     "\x1b[38;5;45Foobar\x1b[0",
     [text("\x1b[38;5;45Foobar\x1b[0"),]
 );
-test_parse_sgr!(parse_1, "38;5;45", [esc(FgColor(AnsiColor::Bit8(45)))]);
-test_parse_sgr!(
-    parse_2,
-    "5;45",
-    [esc(SlowBlink), esc(BgColor(AnsiColor::Bit4(45)))]
-);
+test_parse_sgr!(parse_1, "38;5;45", [esc(FgColor(Bit8(45)))]);
+test_parse_sgr!(parse_2, "5;45", [esc(SlowBlink), esc(BgColor(Bit4(45)))]);
 test_parse_sgr!(
     parse_3,
     "48;2;127;0;255",
-    [esc(BgColor(AnsiColor::Bit24 {
+    [esc(BgColor(Bit24 {
         r: 127,
         g: 0,
         b: 255
@@ -45,7 +43,7 @@ test_parse_sgr!(
     "2;48;2;127;0;255",
     [
         esc(Faint),
-        esc(BgColor(AnsiColor::Bit24 {
+        esc(BgColor(Bit24 {
             r: 127,
             g: 0,
             b: 255
@@ -59,7 +57,7 @@ test_parse_sgr!(
         esc(Bold),
         esc(Faint),
         esc(Italic),
-        esc(FgColor(AnsiColor::Bit24 {
+        esc(FgColor(Bit24 {
             r: 255,
             g: 255,
             b: 0,
@@ -67,15 +65,31 @@ test_parse_sgr!(
         esc(Reset(0)),
     ]
 );
-test_parse_sgr!(
-    parse_fg_8bit,
-    "38;5;128",
-    [esc(FgColor(AnsiColor::Bit8(128)))]
-);
+test_parse_sgr!(parse_fg_8bit, "38;5;128", [esc(FgColor(Bit8(128)))]);
 test_parse_sgr!(
     parse_fg_24bit,
     "38;2;1;2;3",
-    [esc(FgColor(AnsiColor::Bit24 { r: 1, g: 2, b: 3 }))]
+    [esc(FgColor(Bit24 { r: 1, g: 2, b: 3 }))]
+);
+test_parse_sgr!(
+    test_some_sequence_1,
+    "3;4;48;2;4;5;6;38;2;1;2;3",
+    [
+        esc(Italic),
+        esc(Underline),
+        esc(BgColor(Bit24 { r: 4, g: 5, b: 6 })),
+        esc(FgColor(Bit24 { r: 1, g: 2, b: 3 }))
+    ]
+);
+test_parse_sgr!(
+    test_some_sequence_2,
+    "3;4;44;31",
+    [
+        esc(Italic),
+        esc(Underline),
+        esc(BgColor(Bit4(44))),
+        esc(FgColor(Bit4(31)))
+    ]
 );
 
 #[test]
@@ -109,10 +123,10 @@ fn expect_byte(b: u8) -> Output<'static, VisualAttribute> {
         n @ 22..=25 => esc(Reset(n)),
         26 => esc(ProportionalSpacing),
         n @ 27..=29 => esc(Reset(n)),
-        n @ 30..=37 => esc(FgColor(AnsiColor::Bit4(n))),
+        n @ 30..=37 => esc(FgColor(Bit4(n))),
         38 => text("38"),
         39 => esc(Reset(39)),
-        n @ 40..=47 => esc(BgColor(AnsiColor::Bit4(n))),
+        n @ 40..=47 => esc(BgColor(Bit4(n))),
         48 => text("48"),
         49 => esc(Reset(49)),
         50 => esc(Reset(50)),
@@ -131,8 +145,8 @@ fn expect_byte(b: u8) -> Output<'static, VisualAttribute> {
         73 => esc(Superscript),
         74 => esc(Subscript),
         75 => esc(Reset(75)),
-        n @ 90..=97 => esc(FgColor(AnsiColor::Bit4(n))),
-        n @ 100..=107 => esc(BgColor(AnsiColor::Bit4(n))),
+        n @ 90..=97 => esc(FgColor(Bit4(n))),
+        n @ 100..=107 => esc(BgColor(Bit4(n))),
         n => text(n.to_string()),
     }
 }
