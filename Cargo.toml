@@ -1,5 +1,5 @@
 [package]
-name = "ansi_rs"
+name = "ansitok"
 description = "A library for parsing ANSI Escape Codes"
 homepage = "https://gitlab.com/zhiburt/ansi_rs"
 repository = "https://gitlab.com/zhiburt/ansi_rs"

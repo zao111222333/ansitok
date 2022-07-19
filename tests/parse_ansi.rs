@@ -1,7 +1,4 @@
-use ansi_rs::{
-    parse_ansi,
-    {AnsiSequence::*, Output::Escape as esc, Output::Text as text},
-};
+use ansitok::{parse_ansi, AnsiSequence::*, Output::Escape as esc, Output::Text as text};
 
 macro_rules! test_parse_ansi {
     ($name:ident, $string:expr, $expected:expr) => {

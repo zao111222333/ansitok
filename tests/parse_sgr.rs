@@ -1,4 +1,4 @@
-use ansi_rs::{
+use ansitok::{
     parse_ansi_sgr,
     AnsiColor::*,
     Output,
