@@ -1,7 +1,7 @@
 use core::fmt;
 
 /// An attribute of Select Graphic Rendition(SGR)
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum VisualAttribute {
     /// A bold.
     Bold,
@@ -61,8 +61,8 @@ pub enum VisualAttribute {
     Reset(u8),
 }
 
-/// Bold.
-#[derive(Debug, Clone, PartialEq)]
+/// A Color representation in ANSI sequences.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AnsiColor {
     /// A color from [VisualAttribute].
     ///

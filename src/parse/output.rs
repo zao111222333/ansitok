@@ -1,7 +1,7 @@
 use core::fmt::{Display, Formatter, Result as DisplayResult};
 
 /// The type which represents a result of parsing.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Output<'a, S> {
     /// A string output.
     Text(&'a str),

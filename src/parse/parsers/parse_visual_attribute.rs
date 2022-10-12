@@ -12,6 +12,14 @@ fn peak_parser(input: &str) -> IResult<&str, VisualAttribute> {
     use parsers::*;
 
     alt((
+        alt((gm_fg_color, gm_bg_color, gm_undr_color)),
+        alt((
+            gm_bg_b_0, gm_bg_b_1, gm_bg_b_2, gm_bg_b_3, gm_bg_b_4, gm_bg_b_5, gm_bg_b_6, gm_bg_b_7,
+        )),
+        alt((
+            gm_font_0, gm_font_1, gm_font_2, gm_font_3, gm_font_4, gm_font_5, gm_font_6, gm_font_7,
+            gm_font_8,
+        )),
         alt((
             gm_reset_0,
             gm_reset_22,
@@ -31,25 +39,13 @@ fn peak_parser(input: &str) -> IResult<&str, VisualAttribute> {
             gm_reset_75,
         )),
         alt((
-            gm_bold,
-            gm_faint,
-            gm_italic,
-            gm_underline,
-            gm_blink_slow,
-            gm_blink_rapid,
-            gm_inverse,
-            gm_hide,
-            gm_crossedout,
-            gm_reset_font,
-            gm_fraktur,
             gm_underline_double,
             gm_proportional_spacing,
             gm_framed,
             gm_encircled,
             gm_overlined,
-            gm_fg_color,
-            gm_bg_color,
-            gm_undr_color,
+            gm_reset_font,
+            gm_fraktur,
         )),
         alt((
             gm_igrm_underline,
@@ -61,10 +57,6 @@ fn peak_parser(input: &str) -> IResult<&str, VisualAttribute> {
             gm_subscript,
         )),
         alt((
-            gm_font_0, gm_font_1, gm_font_2, gm_font_3, gm_font_4, gm_font_5, gm_font_6, gm_font_7,
-            gm_font_8,
-        )),
-        alt((
             gm_fg_0, gm_fg_1, gm_fg_2, gm_fg_3, gm_fg_4, gm_fg_5, gm_fg_6, gm_fg_7,
         )),
         alt((
@@ -74,7 +66,15 @@ fn peak_parser(input: &str) -> IResult<&str, VisualAttribute> {
             gm_fg_b_0, gm_fg_b_1, gm_fg_b_2, gm_fg_b_3, gm_fg_b_4, gm_fg_b_5, gm_fg_b_6, gm_fg_b_7,
         )),
         alt((
-            gm_bg_b_0, gm_bg_b_1, gm_bg_b_2, gm_bg_b_3, gm_bg_b_4, gm_bg_b_5, gm_bg_b_6, gm_bg_b_7,
+            gm_bold,
+            gm_faint,
+            gm_italic,
+            gm_underline,
+            gm_blink_slow,
+            gm_blink_rapid,
+            gm_inverse,
+            gm_hide,
+            gm_crossedout,
         )),
     ))(input)
 }
@@ -87,12 +87,6 @@ mod parsers {
         ($sig:ident, $val:expr, $ret:expr) => {
             pub fn $sig(input: &str) -> IResult<&str, VisualAttribute> {
                 let (input, _) = nom::bytes::complete::tag($val)(input)?;
-                if !input.is_empty() {
-                    // We actually could eliminate this by correcting an order
-                    // in which case it may be faster?
-                    let _ = nom::combinator::peek(nom::bytes::complete::tag(";"))(input)?;
-                }
-
                 Ok((input, $ret))
             }
         };

@@ -45,8 +45,10 @@
 //! }
 //! ```
 
+mod element;
 mod parse;
-mod parsers;
 
-pub use parse::{AnsiColor, AnsiSequence, VisualAttribute};
-pub use parsers::{parse_ansi, parse_ansi_sgr, AnsiSequenceParser, Output, SGRParser};
+pub use element::{Element, ElementKind};
+pub use parse::{
+    parse_ansi, parse_ansi_sgr, AnsiColor, AnsiIterator, EscapeCode, Output, VisualAttribute,
+};
