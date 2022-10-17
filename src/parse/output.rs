@@ -9,6 +9,24 @@ pub enum Output<'a, S> {
     Escape(S),
 }
 
+impl<'a, S> Output<'a, S> {
+    /// Returns an escape sequence.
+    pub fn as_escape(self) -> Option<S> {
+        match self {
+            Output::Text(_) => None,
+            Output::Escape(esc) => Some(esc),
+        }
+    }
+
+    /// Returns a text.
+    pub fn as_text(self) -> Option<&'a str> {
+        match self {
+            Output::Text(text) => Some(text),
+            Output::Escape(_) => None,
+        }
+    }
+}
+
 impl<'a, S> Display for Output<'a, S>
 where
     S: Display,
