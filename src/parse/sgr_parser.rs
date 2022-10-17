@@ -1,7 +1,7 @@
 use super::{parsers::parse_visual_attribute, Output, VisualAttribute};
 
 /// Creates a parser for Select Graphic Rendition(SGR) sequences.
-/// 
+///
 /// NOTE: The interace is not very stable yet.
 pub fn parse_ansi_sgr(text: &str) -> SGRParser<'_> {
     let text = text
