@@ -6,7 +6,7 @@ repository = "https://gitlab.com/zhiburt/ansitok"
 authors = ["Maxim Zhiburt <zhiburt@gmail.com>"]
 keywords = ["ansi", "escape", "terminal"]
 categories = ["parser-implementations", "no-std"]
-version = "0.1.0"
+version = "0.1.1"
 license = "MIT"
 edition = "2021"
 
