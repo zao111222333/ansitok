@@ -1,7 +1,9 @@
 use core::fmt;
 
+use super::parsers::parse_visual_attribute;
+
 /// An attribute of Select Graphic Rendition(SGR)
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum VisualAttribute {
     /// A bold.
     Bold,
@@ -61,28 +63,24 @@ pub enum VisualAttribute {
     Reset(u8),
 }
 
-/// Bold.
-#[derive(Debug, Clone, PartialEq)]
-pub enum AnsiColor {
-    /// A color from [VisualAttribute].
+impl VisualAttribute {
+    /// Parse a visual attribute.
     ///
-    /// An example: `ESC[39;49m`.
-    Bit4(u8),
-    /// An index color.
+    /// # Example
     ///
-    /// An example: `ESC[38:5:⟨n⟩m`.
-    Bit8(u8),
-    /// A 3 digit color.
+    /// ```
+    /// use ansitok::VisualAttribute;
     ///
-    /// An example: `ESC[48;2;⟨r⟩;⟨g⟩;⟨b⟩m`.
-    Bit24 {
-        /// Red.
-        r: u8,
-        /// Green.
-        g: u8,
-        /// Blue.
-        b: u8,
-    },
+    /// assert_eq!(VisualAttribute::parse("1"), Some(VisualAttribute::Bold));
+    /// ```
+    pub fn parse<S>(text: S) -> Option<Self>
+    where
+        S: AsRef<str>,
+    {
+        parse_visual_attribute(text.as_ref())
+            .ok()
+            .map(|(_, attr)| attr)
+    }
 }
 
 impl fmt::Display for VisualAttribute {
@@ -124,6 +122,30 @@ impl fmt::Display for VisualAttribute {
 
         Ok(())
     }
+}
+
+/// A Color representation in ANSI sequences.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum AnsiColor {
+    /// A color from [VisualAttribute].
+    ///
+    /// An example: `ESC[39;49m`.
+    Bit4(u8),
+    /// An index color.
+    ///
+    /// An example: `ESC[38:5:⟨n⟩m`.
+    Bit8(u8),
+    /// A 3 digit color.
+    ///
+    /// An example: `ESC[48;2;⟨r⟩;⟨g⟩;⟨b⟩m`.
+    Bit24 {
+        /// Red.
+        r: u8,
+        /// Green.
+        g: u8,
+        /// Blue.
+        b: u8,
+    },
 }
 
 fn write_color(f: &mut fmt::Formatter, color: &AnsiColor, prefix: &str) -> fmt::Result {

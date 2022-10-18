@@ -20,12 +20,17 @@ test_parse_sgr!(parse_empty, "", []); // is this correct? or we shall consider i
 test_parse_sgr!(
     parse_valid_ansi_sequence,
     "\x1b[38;5;45mFoobar\x1b[0m",
-    [text("\x1b[38;5;45mFoobar\x1b[0m"),]
+    [text("38;5;45mFoobar\x1b[0"),]
 );
 test_parse_sgr!(
     parse_invalid_ansi_sequence,
     "\x1b[38;5;45Foobar\x1b[0",
     [text("\x1b[38;5;45Foobar\x1b[0"),]
+);
+test_parse_sgr!(
+    parse_invalid_ansi_sequence2,
+    "38;5;45\x1b[0",
+    [text("38;5;45\x1b[0"),]
 );
 test_parse_sgr!(parse_1, "38;5;45", [esc(FgColor(Bit8(45)))]);
 test_parse_sgr!(parse_2, "5;45", [esc(SlowBlink), esc(BgColor(Bit4(45)))]);
@@ -94,7 +99,7 @@ test_parse_sgr!(
 
 #[test]
 fn test_parsing_single_byte() {
-    for i in 0..u8::MAX {
+    for i in 38..39 {
         let expected = expect_byte(i);
 
         let s = i.to_string();
