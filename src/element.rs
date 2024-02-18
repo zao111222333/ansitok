@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 /// Element indicates a slice position in the string and its type.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Element {
@@ -52,6 +54,14 @@ impl Element {
     /// Returns an end position of a slice.
     pub fn end(&self) -> usize {
         self.pos.1
+    }
+
+    /// Returns the range of a slice.
+    pub fn range(&self) -> Range<usize> {
+        Range {
+            start: self.pos.0,
+            end: self.pos.1,
+        }
     }
 }
 
