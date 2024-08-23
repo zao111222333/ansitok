@@ -18,9 +18,9 @@
 //!
 //! ```
 //! use ansitok::parse_ansi;
-//!
+//! use std::borrow::Cow;
 //! let text = "\x1b[31;1;4mHello World\x1b[0m";
-//! for token in parse_ansi(text) {
+//! for token in parse_ansi(Cow::Borrowed(text)) {
 //!     let kind = token.kind();
 //!     let token_text = &text[token.start()..token.end()];
 //!
@@ -32,9 +32,9 @@
 //!
 //! ```
 //! use ansitok::{parse_ansi, parse_ansi_sgr, Output, ElementKind};
-//!
+//! use std::borrow::Cow;
 //! let text = "\x1b[31;1;4mHello World\x1b[0m \x1b[38;2;255;255;0m!!!\x1b[0m";
-//! for token in parse_ansi(text) {
+//! for token in parse_ansi(Cow::Borrowed(text)) {
 //!     if token.kind() != ElementKind::Sgr {
 //!         continue;
 //!     }

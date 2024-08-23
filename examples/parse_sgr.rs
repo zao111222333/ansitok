@@ -1,9 +1,11 @@
-use ansitok::{parse_ansi, parse_ansi_sgr, ElementKind};
+use std::borrow::Cow;
+
+use ansitok_forked::{parse_ansi, parse_ansi_sgr, ElementKind};
 
 fn main() {
     let text = "\x1b[31;1;4mHello World\x1b[0m \x1b[38;2;255;255;0m!!!\x1b[0m";
 
-    for element in parse_ansi(text) {
+    for element in parse_ansi(Cow::Borrowed(text)) {
         if element.kind() != ElementKind::Sgr {
             continue;
         }

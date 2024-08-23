@@ -1,16 +1,18 @@
-use ansitok::{parse_ansi, EscapeCode};
+use ansitok_forked::{parse_ansi, EscapeCode};
 use EscapeCode::*;
 
 macro_rules! test_parse_ansi {
     ($name:ident, $string:expr, $expected:expr) => {
         #[test]
         fn $name() {
-            println!("{:?}", parse_ansi($string).collect::<Vec<_>>());
-
-            let sequences: Vec<_> = parse_ansi($string)
+            let sequences: Vec<_> = parse_ansi(std::borrow::Cow::Borrowed($string))
                 .flat_map(|e| EscapeCode::parse(&$string[e.start()..e.end()]))
                 .collect();
             assert_eq!(sequences, $expected);
+            let sequences_owned: Vec<_> = parse_ansi(std::borrow::Cow::Owned($string.to_owned()))
+                .flat_map(|e| EscapeCode::parse(&$string[e.start()..e.end()]))
+                .collect();
+            assert_eq!(sequences_owned, $expected);
         }
     };
 }

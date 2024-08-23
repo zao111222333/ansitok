@@ -1,4 +1,4 @@
-use ansitok::{
+use ansitok_forked::{
     parse_ansi_sgr,
     AnsiColor::*,
     Output,

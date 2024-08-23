@@ -1,17 +1,42 @@
 use core::str::Bytes;
+use std::borrow::Cow;
 use vte::Params;
 
 use crate::Element;
 
 /// Creates a parser for ANSI escape sequences.
-pub fn parse_ansi(text: &str) -> AnsiIterator<'_> {
+pub fn parse_ansi<'a>(text: Cow<'a, str>) -> AnsiIterator<'a> {
     AnsiIterator::new(text)
+}
+// enum NewCowBytes<'a,'s> {
+//     Borrowed(Bytes<'a>),
+//     Owned(Bytes<'s>),
+// }
+// fn new<'a,'s>(s: &'s Cow<'a, str>) -> NewCowBytes<'a,'s> {
+//     match *s {
+//         Cow::Borrowed(s) => NewCowBytes::Borrowed(s.bytes()),
+//         Cow::Owned(ref s) => NewCowBytes::Owned(s.bytes()),
+//     }
+// }
+enum CowBytes<'a> {
+    Borrowed(Bytes<'a>),
+    Owned(std::vec::IntoIter<u8>),
+}
+impl Iterator for CowBytes<'_> {
+    type Item = u8;
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            Self::Borrowed(b) => b.next(),
+            Self::Owned(v) => v.next(),
+        }
+    }
 }
 
 /// An ANSI escape sequence parser.
 pub struct AnsiIterator<'a> {
     // The input bytes
-    bytes: Bytes<'a>,
+    bytes: CowBytes<'a>,
 
     // The state machine
     machine: vte::Parser,
@@ -44,10 +69,13 @@ struct Performer {
 }
 
 impl AnsiIterator<'_> {
-    fn new(s: &str) -> AnsiIterator<'_> {
+    fn new<'a>(s: Cow<'a, str>) -> AnsiIterator<'_> {
         AnsiIterator {
             machine: vte::Parser::new(),
-            bytes: s.bytes(),
+            bytes: match s {
+                Cow::Borrowed(s) => CowBytes::Borrowed(s.bytes()),
+                Cow::Owned(s) => CowBytes::Owned(s.into_bytes().into_iter()),
+            },
             element: None,
             text_length: 0,
             start: 0,
@@ -189,7 +217,7 @@ mod tests {
     #[test]
     fn test_iterator_1() {
         let text = "\x1b[31m0123\x1b[m\n";
-        let elements: Vec<_> = AnsiIterator::new(text).collect();
+        let elements: Vec<_> = AnsiIterator::new(Cow::Borrowed(text)).collect();
 
         assert_eq!(
             elements,
@@ -205,7 +233,7 @@ mod tests {
     #[test]
     fn test_iterator_2() {
         let text = "\x1b[31m0123\x1b[m456\n";
-        let elements: Vec<Element> = AnsiIterator::new(text).collect();
+        let elements: Vec<Element> = AnsiIterator::new(Cow::Borrowed(text)).collect();
 
         assert_eq!(
             elements,
@@ -223,7 +251,7 @@ mod tests {
     #[test]
     fn test_iterator_styled_non_ascii() {
         let text = "\x1b[31mバー\x1b[0m";
-        let elements: Vec<Element> = AnsiIterator::new(text).collect();
+        let elements: Vec<Element> = AnsiIterator::new(Cow::Borrowed(text)).collect();
         assert_eq!(
             elements,
             vec![
@@ -238,7 +266,7 @@ mod tests {
     #[test]
     fn test_iterator_erase_in_line() {
         let text = "\x1b[0Kあ.\x1b[m";
-        let elements: Vec<_> = AnsiIterator::new(text).collect();
+        let elements: Vec<_> = AnsiIterator::new(Cow::Borrowed(text)).collect();
         assert_eq!(
             elements,
             vec![Element::csi(0, 4), Element::text(4, 8), Element::sgr(8, 11),]
@@ -249,7 +277,7 @@ mod tests {
     #[test]
     fn test_iterator_erase_in_line_without_n() {
         let text = "\x1b[Kあ.\x1b[m";
-        let actual_elements: Vec<Element> = AnsiIterator::new(text).collect();
+        let actual_elements: Vec<Element> = AnsiIterator::new(Cow::Borrowed(text)).collect();
         assert_eq!(
             actual_elements,
             vec![Element::csi(0, 3), Element::text(3, 7), Element::sgr(7, 10),]
@@ -261,7 +289,7 @@ mod tests {
     fn test_iterator_osc_hyperlinks_styled_non_ascii() {
         let text = "\x1b[38;5;4m\x1b]8;;file:///Users/dan/src/delta/src/ansi/mod.rs\x1b\\src/ansi/modバー.rs\x1b]8;;\x1b\\\x1b[0m\n";
 
-        let elements: Vec<Element> = AnsiIterator::new(text).collect();
+        let elements: Vec<Element> = AnsiIterator::new(Cow::Borrowed(text)).collect();
 
         assert_eq!(
             elements,

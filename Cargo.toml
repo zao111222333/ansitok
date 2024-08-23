@@ -1,5 +1,5 @@
 [package]
-name = "ansitok"
+name = "ansitok-forked"
 description = "A library for parsing ANSI Escape Codes"
 homepage = "https://gitlab.com/zhiburt/ansitok"
 repository = "https://gitlab.com/zhiburt/ansitok"

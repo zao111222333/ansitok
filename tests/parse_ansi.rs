@@ -1,11 +1,13 @@
-use ansitok::{parse_ansi, Element};
-
+use ansitok_forked::{parse_ansi, Element};
+use std::borrow::Cow;
 macro_rules! test_parse_ansi {
     ($name:ident, $string:expr, $expected:expr) => {
         #[test]
         fn $name() {
-            let sequences: Vec<_> = parse_ansi($string).collect();
+            let sequences: Vec<_> = parse_ansi(Cow::Borrowed($string)).collect();
             assert_eq!(sequences, $expected);
+            let sequences_owned: Vec<_> = parse_ansi(Cow::Owned($string.to_owned())).collect();
+            assert_eq!(sequences_owned, $expected);
         }
     };
 }
